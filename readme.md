@@ -16,10 +16,10 @@ This project is all about music. There are multiple rooms, each with their own m
 <!-- Maybe a table of contents here? 📚 -->
 # Navigation
 
-[Installation](#installation)
-[Usage](#usage)
-[Spotify](#spotify)
-[Done's and Todo's](#done's-and-todo's)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Spotify](#spotify)
+- [Done's and Todo's](#done's-and-todo's)
 
 
 <!-- How about a section that describes how to install this project? 🤓 -->
@@ -55,17 +55,17 @@ I'm using the universal wrapper for the Spotify Web Api: [Spotify Web API Node](
 # Done's and Todo's
 
 ## Done's:
-[x] Messaging through Socket.io.
-[x] Join different chat Socket rooms.
-[x] SpotifyWebApi web api login button.
-[x] Receive data from SpotifyWebApi.
-[x] Render data from SpotifyWebApi.
+- [x] Messaging through Socket.io.
+- [x] Join different chat Socket rooms.
+- [x] SpotifyWebApi web api login button.
+- [x] Receive data from SpotifyWebApi.
+- [x] Render data from SpotifyWebApi.
 
 ## Todo's
-[] Differentiate users in Socket.io.
-[] Different users can log in to their own Spotify account.
-[] Music playlists play in the chat rooms.
-[] Users in rooms can guess the current song playing.
-[] Scoreboard in each room.
+- [] Differentiate users in Socket.io.
+- [] Different users can log in to their own Spotify account.
+- [] Music playlists play in the chat rooms.
+- [] Users in rooms can guess the current song playing.
+- [] Scoreboard in each room.
 
 <!-- How about a license here? 📜 (or is it a licence?) 🤷 -->
