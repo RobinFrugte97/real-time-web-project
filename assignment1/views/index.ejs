@@ -1,0 +1,75 @@
+<% include head.ejs %>
+<body>
+  <header>
+    <a href="<%=authorizeURL%>">Log in to Spotify</a>
+     <ul id="rooms">
+  <% for (var i = 0; rooms.length > i; i++) { %>
+    <a href="#" id="<%=rooms[i]%>"><%=rooms[i]%></a>
+  <% } %>
+     </ul>
+  </header>
+  <div id="allesWrap">
+    <div id="playlistWrap">
+      <ul>
+
+          
+
+      </ul>
+      <button type="button" name="button" id="check">Check current song</button>
+      <ul id="currentSongs">
+
+      </ul>
+    </div>
+    <h2 id="currentRoom"></h2>
+     <ul id="messages"></ul>
+  </div>
+
+   <form id="form">
+     <label for="name">NAME:</label>
+     <input id="name" name="name" type="text">
+     <label for="m">MESSAGE:</label>
+     <input id="m" name="m" autocomplete="off" /><button id="test">Send</button>
+   </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var id = socket.id;
+        var message = document.getElementById('m')
+        var form = document.getElementById('form')
+        var messageList = document.getElementById('messages')
+        var nameEdit = document.getElementById('name')
+        var checkButton = document.getElementById('check')
+        var currentRoom = document.getElementById('currentRoom')
+
+        var roomLinks = document.querySelectorAll('a')
+        for (var i = 0; roomLinks.length > i; i++) {
+          roomLinks[i].addEventListener('click', function(event) {
+            link = event.target.id;
+            socket.emit('join room', link)
+          })
+        }
+        form.addEventListener('submit', function(event) {
+          event.preventDefault();
+          socket.emit('chat message', message.value, nameEdit.value)
+          message.value = '';
+        })
+        socket.on('chat message', function(msg, name) {
+          console.log(msg + name);
+          var singleMessage = document.createElement('li')
+          singleMessage.innerHTML = msg + "    By:   " + name
+          messageList.append(singleMessage)
+        })
+        socket.on('join room', function(room, renderNaam) {
+          var singleMessage = document.createElement('li')
+          singleMessage.innerHTML = renderNaam + ' is now in room ' + room
+          messageList.append(singleMessage)
+          console.log(room);
+        })
+        socket.on('change room header', function(room) {
+          currentRoom.innerHTML = room
+        })
+        checkButton.addEventListener('click', function(){
+          socket.emit('check current song')
+        })
+    </script>
+</body>
