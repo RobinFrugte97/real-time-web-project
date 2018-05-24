@@ -1,0 +1,158 @@
+<% include head.ejs %>
+  <body id="indexBody">
+    <header>
+      <div id="bleh">
+        <label for="pixabayText">Zoek een afbeelding..</label>
+        <input type="text" id="pixabayText" name="" value="">
+      </div>
+      <input type="submit" id="pixabaySubmit" name="" value="">
+      <div id="results">
+
+      </div>
+    </header>
+    <section id="container">
+        <div class="placeholder">
+            <label for="fileUpload">Selecteer een afbeelding..</label>
+            <input type="file" id="fileUpload" name="fileUpload" oninput="previewFile()">
+            <img id="image" src="">
+        </div>
+        <button class="remove">X</button>
+    </section>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+    (function(){
+      socket.emit('loadNotes')
+    })()
+    var backgroundDiv = document.getElementById('doei')
+    var image = document.getElementById('image')
+    var container = document.getElementById('container')
+    var pixabayText = document.getElementById('pixabayText')
+    var displayDiv = document.getElementById('results')
+    var pixabaySubmit = document.getElementById('pixabaySubmit')
+    pixabaySubmit.addEventListener('click', function(){
+      var searchQuery = pixabayText.value;
+      displayDiv.innerHTML = ''
+      socket.emit('retrieveImages', searchQuery)
+    })
+    var getCoords = image.addEventListener('click', function(event){
+      var xCoords = event.clientX;
+      var yCoords = event.clientY;
+      console.log(xCoords, yCoords);
+      socket.emit('createNote', xCoords, yCoords)
+    })
+    var preview = document.getElementById('image'); //selects the query named img
+    var placeholder = document.querySelector('.placeholder')
+    var remove = document.querySelector('.remove')
+    var file    = document.querySelector('input[type=file]')
+
+    function previewFile(){
+        var preview = document.getElementById('image') //selects the query named img
+        var file    = document.querySelector('input[type=file]').files[0]; //sames as here
+        var reader  = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+            var source = preview.src
+            socket.emit('imageSave', source)
+        }
+
+        if (file) {
+            var saven = reader.readAsDataURL(file);
+            placeholder.style.border = "none"; //reads the data as a URL
+
+        }
+    }
+
+    previewFile();  //calls the function named previewFile()
+
+    remove.addEventListener("click", function(){
+        file.click()
+
+    })
+
+    socket.on('onConnect', function(data){
+      for(i = 0; data.length > i; i++) {
+        console.log(data[i]);
+        var formNote = document.createElement('form')
+        var note = document.createElement('div')
+        var text = document.createElement('textarea')
+        var submitButton = document.createElement('input')
+        submitButton.type = 'submit'
+        text.value = data[i].noteValue;
+        note.setAttribute('Style', 'top: '+ data[i].yCoords + 'px; left: ' + data[i].xCoords + 'px; position: fixed;')
+        note.setAttribute('id', 'note')
+        submitButton.setAttribute('id', 'submit')
+        document.body.appendChild(note)
+        note.appendChild(formNote)
+        formNote.appendChild(text)
+        formNote.appendChild(submitButton)
+        formNote.addEventListener('submit', function(event){
+          event.preventDefault()
+          socket.emit('saveNote', {
+            noteValue: text.value,
+            yCoords: yCoords,
+            xCoords: xCoords
+          })
+        })
+      }
+    })
+
+    socket.on('note', function(xCoords, yCoords){
+      var formNote = document.createElement('form')
+      var note = document.createElement('div')
+      var text = document.createElement('textarea')
+      var submitButton = document.createElement('input')
+      submitButton.type = 'submit'
+      text.value = 'Jouw notitie';
+      note.setAttribute('Style', 'top: '+ yCoords + 'px; left: ' + xCoords + 'px; position: fixed;')
+      note.setAttribute('id', 'note')
+      submitButton.setAttribute('id', 'submit')
+      document.body.appendChild(note)
+      note.appendChild(formNote)
+      formNote.appendChild(text)
+      formNote.appendChild(submitButton)
+      formNote.addEventListener('submit', function(event){
+        event.preventDefault()
+        socket.emit('saveNote', {
+          noteValue: text.value,
+          yCoords: yCoords,
+          xCoords: xCoords
+        })
+      })
+    })
+
+    socket.on('renderImage', function(source){
+      image.src = source
+      placeholder.style.border = "none";
+    })
+    socket.on('setImage', function(imageDing){
+      if (imageDing !== '') {
+        image.src = imageDing
+        placeholder.style.border = "none";
+      }
+    })
+    socket.on('returnImages', function(dete){
+      console.log(dete);
+      for(i=0; dete.length > i; i++){
+        var pixabayImage = document.createElement('img')
+        pixabayImage.src = dete[i].webformatURL
+        pixabayImage.classList.add('pixabayImage')
+        displayDiv.appendChild(pixabayImage)
+
+      }
+      var images = document.querySelectorAll('.pixabayImage')
+      for(j=0; images.length > j; j++){
+        (function(){
+          var imgSource = images[j].src
+          images[j].addEventListener('click', function(event){
+            event.preventDefault();
+            socket.emit('imageSave', imgSource)
+          })
+        })()
+      }
+    })
+
+  </script>
+</html>
