@@ -46,6 +46,8 @@ After installation, type `node server` in your node console. Go to http://localh
 
 # Data Life Cycle
 
+The data is stored serverside or retrieved from the Pixabay API. The user adds to the serversided storage by adding notes and setting an image.
+
 ![](https://github.com/RobinFrugte97/real-time-web-project/blob/master/images/dataLifeCycle.png)
 
 <!-- What external data source is featured in your project and what are its properties 🌠 -->
@@ -70,5 +72,6 @@ The Pixabay Api lets the application fetch data from the Pixabay image catalog.
 - [ ] Differentiate users in Socket.io.
 - [ ] Make it so the users have the ability to delete notes.
 - [ ] Have the notes saved with different pictures.
+- [ ] Use an external database to store data.
 
 <!-- How about a license here? 📜 (or is it a licence?) 🤷 -->
