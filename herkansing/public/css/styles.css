@@ -1,5 +1,4 @@
 body {
-  width: 100vw;
   height: 100vh;
   overflow-x: auto;
   overflow-y: auto;
@@ -10,24 +9,24 @@ body {
 
 header {
   width: 100%;
-  height: 10em;
+  height: 13em;
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding-top: 5em;
   padding-left: 12em;
+  margin-bottom: 1em;
 }
 
 #note {
   position: fixed;
-  height: 200px;
-  width: 300px;
+  height: 100px;
+  width: 150px;
   z-index: 10000;
 }
 form {
   position: absolute;
   width: 100%;
-  height: 200px;
+  height: 100%;
 }
 
 input {
@@ -49,7 +48,7 @@ input {
 }
 
 #container {
-  height: 83vh;
+  height: 75vh;
   width: 100vw;
   display: flex;
   justify-content: center;
@@ -72,7 +71,7 @@ input {
   z-index: 1;
   object-fit: contain;
   box-shadow: 0px 0px 100px rgba(0, 0, 0, 0.211);
-  max-width: 75%;
+  max-width: 65%;
 }
 
 .remove {
@@ -141,12 +140,13 @@ textarea {
   border:none;
   background-color:#EAEAEA;
   padding:1em;
-  border-radius: 10px 10px 0px 0px;
+  border-radius: 0px 10px 0px 0px;
 }
 
 #pixabayText {
   position: relative;
   margin-top: 0;
+  cursor: text;
 }
 
 #pixabaySubmit {
@@ -177,4 +177,29 @@ textarea {
 header label {
   transform: translateY(0);
   padding: 0;
+}
+
+.placeholder>label {
+  position: absolute;
+}
+
+#error {
+  display: flex;
+  z-index: 100000000000000000000000000000000;
+  flex-direction: column;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 7.5em;
+  background-color: red;
+}
+
+#errorMessage {
+  height: 2em;
+  width: 16em;
+  transform: translateY(100%) translateX(42vw);
+  font-family: helvetica;
+  text-align: center;
+  color: white;
+  font-size: 1.25em;
 }

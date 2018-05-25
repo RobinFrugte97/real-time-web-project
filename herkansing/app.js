@@ -32,6 +32,7 @@ io.on('connection', function(socket){
   socket.on('saveNote', function(noteData) {
     data.push(noteData)
     console.log(data);
+    io.emit('updateNote', noteData)
   })
   socket.on('imageSave', function(source){
     imageDing = source;
@@ -50,5 +51,12 @@ io.on('connection', function(socket){
         console.log(dete);
         io.to(socket.id).emit('returnImages', dete)
       });
+      .catch(function(){
+        io.emit('externalError')
+      })
+  })
+  socket.on('reset', function(){
+    imageDing = ''
+    data = []
   })
 });
