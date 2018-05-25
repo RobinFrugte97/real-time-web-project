@@ -1,0 +1,196 @@
+<% include head.ejs %>
+  <body id="indexBody">
+    <header>
+      <div id="bleh">
+        <label for="pixabayText">Zoek een afbeelding..</label>
+        <input type="text" id="pixabayText" name="" value="">
+      </div>
+      <input type="submit" id="pixabaySubmit" name="" value="Zoek">
+      <div id="results">
+
+      </div>
+    </header>
+    <section id="container">
+        <div class="placeholder">
+            <label for="fileUpload">Selecteer een afbeelding..</label>
+            <input type="file" id="fileUpload" name="fileUpload" oninput="previewFile()">
+            <img id="image" src="">
+        </div>
+        <button class="remove">X</button>
+    </section>
+    <footer id="error"> <p id="errorMessage">Geen connectie met de server. Functionaliteiten zijn offline.</p> </footer>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+    (function(){
+      socket.emit('loadNotes')
+    })()
+    var backgroundDiv = document.getElementById('doei')
+    var image = document.getElementById('image')
+    var container = document.getElementById('container')
+
+    var pixabayText = document.getElementById('pixabayText')
+    var displayDiv = document.getElementById('results')
+    var pixabaySubmit = document.getElementById('pixabaySubmit')
+    var body = document.getElementById('indexBody')
+    pixabaySubmit.addEventListener('click', function(){
+      checkSocketConnection()
+      var searchQuery = pixabayText.value;
+      displayDiv.innerHTML = ''
+      socket.emit('retrieveImages', searchQuery)
+    })
+    var getCoords = image.addEventListener('click', function(event){
+      var xCoords = event.clientX + 'px';
+      var yCoords = event.clientY + 'px';
+      console.log(xCoords, yCoords);
+      socket.emit('createNote', xCoords, yCoords)
+    })
+    var preview = document.getElementById('image'); //selects the query named img
+    var placeholder = document.querySelector('.placeholder')
+    var remove = document.querySelector('.remove')
+    var file    = document.querySelector('input[type=file]')
+
+    function previewFile(){
+        var preview = document.getElementById('image') //selects the query named img
+        var file    = document.querySelector('input[type=file]').files[0]; //sames as here
+        var reader  = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+            var source = preview.src
+            socket.emit('imageSave', source)
+        }
+
+        if (file) {
+            var saven = reader.readAsDataURL(file);
+            placeholder.style.border = "none"; //reads the data as a URL
+
+        }
+    }
+
+    previewFile();  //calls the function named previewFile()
+
+    remove.addEventListener("click", function(body){
+        image.src = ''
+        placeholder.setAttribute('Style', 'border: 4px dashed rgba(0, 0, 0, 0.39);');
+        var alleNotes = document.querySelectorAll('.notitie')
+        for(i = 0; alleNotes.length > 0; i++){
+          alleNotes[i].setAttribute('Style', 'display: none;')
+        }
+        socket.emit('reset')
+    })
+
+    socket.on('onConnect', function(data){
+      checkSocketConnection()
+      for(i = 0; data.length > i; i++) {
+        console.log(data[i]);
+        var formNote = document.createElement('form')
+        var note = document.createElement('div')
+        var text = document.createElement('textarea')
+        var submitButton = document.createElement('input')
+        note.classList.add('notitie')
+        submitButton.type = 'submit'
+        text.value = data[i].noteValue;
+        note.setAttribute('Style', 'top: '+ data[i].yCoords +'; left: ' + data[i].xCoords + '; position: fixed;')
+        note.setAttribute('id', 'note')
+        submitButton.setAttribute('id', 'submit')
+        document.body.appendChild(note)
+        note.appendChild(formNote)
+        formNote.appendChild(text)
+        formNote.appendChild(submitButton)
+        formNote.addEventListener('submit', function(event){
+          event.preventDefault()
+          socket.emit('saveNote', {
+            noteValue: text.value,
+            yCoords: yCoords,
+            xCoords: xCoords
+          })
+        })
+      }
+    })
+
+    socket.on('note', function(xCoords, yCoords){
+      checkSocketConnection()
+      var formNote = document.createElement('form')
+      var note = document.createElement('div')
+      var text = document.createElement('textarea')
+      var submitButton = document.createElement('input')
+      note.classList.add('notitie')
+      submitButton.type = 'submit'
+      text.value = 'Jouw notitie';
+      note.setAttribute('Style', 'top: '+ yCoords + '; left: ' + xCoords + '; position: fixed;')
+      note.setAttribute('id', 'note')
+      submitButton.setAttribute('id', 'submit')
+      document.body.appendChild(note)
+      note.appendChild(formNote)
+      formNote.appendChild(text)
+      formNote.appendChild(submitButton)
+      formNote.addEventListener('submit', function(event){
+        event.preventDefault()
+        socket.emit('saveNote', {
+          noteValue: text.value,
+          yCoords: yCoords,
+          xCoords: xCoords
+        })
+      })
+    })
+
+    socket.on('updateNote', function(noteData){
+      var alleNotes = document.querySelectorAll('.notitie')
+      for (i = 0; alleNotes.length > i; i++) {
+        if (noteData.yCoords == window.getComputedStyle(alleNotes[i]).top && noteData.xCoords == window.getComputedStyle(alleNotes[i]).left) {
+          var form = alleNotes[i].firstChild
+          var noteText = form.firstChild
+          noteText.value = noteData.noteValue
+        }
+      }
+    })
+
+    socket.on('renderImage', function(source){
+      image.src = source
+      placeholder.style.border = "none";
+    })
+    socket.on('setImage', function(imageDing){
+      if (imageDing !== '') {
+        image.src = imageDing
+        placeholder.style.border = "none";
+      }
+    })
+    socket.on('returnImages', function(dete){
+      console.log(dete);
+      for(i=0; dete.length > i; i++){
+        var pixabayImage = document.createElement('img')
+        pixabayImage.src = dete[i].webformatURL
+        pixabayImage.classList.add('pixabayImage')
+        displayDiv.appendChild(pixabayImage)
+
+      }
+      var images = document.querySelectorAll('.pixabayImage')
+      for(j=0; images.length > j; j++){
+        (function(){
+          var imgSource = images[j].src
+          images[j].addEventListener('click', function(event){
+            event.preventDefault();
+            socket.emit('imageSave', imgSource)
+          })
+        })()
+      }
+    })
+    socket.on('externalError', function(){
+      var error = document.getElementById('error')
+      error.setAttribute('Style', 'transform: translateY(0%);')
+    })
+
+    function checkSocketConnection(){
+
+      var errorMessage = document.getElementById('errorMessage')
+      if(socket.connected == false) {
+        error.setAttribute('Style', 'transform: translateY(0%);')
+      } else {
+        error.setAttribute('Style', 'transform: translateY(1000%);')
+      }
+    }
+
+  </script>
+</html>
