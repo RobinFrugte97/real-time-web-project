@@ -57,6 +57,8 @@ The Pixabay Api lets the application fetch data from the Pixabay image catalog.
 
 [Pixabay Api](https://pixabay.com/api/docs/)
 
+ The API is a RESTful interface for searching and retrieving free images and videos released on Pixabay under Creative Commons CC0.
+
 
 <!-- Where do the 0️⃣s and 1️⃣s live in your project? What db system are you using?-->
 
