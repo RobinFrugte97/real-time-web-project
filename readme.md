@@ -11,6 +11,8 @@ Some of the goals of this course:
 
 This project is about an image noteboard. The idea come from a hackathon I did for the Weekly Nerd. The idea was to have a picture and the ability to add notes to the picture. I took the idea further and made it real time. Every user on the site can see your notes. Everybody can set a picture for the rest. With the Pixabay API added into the mix, the users can now retrieve a couple of images from Pixabay based on a keyword.
 
+[Link to the app](https://desolate-oasis-49640.herokuapp.com/)
+
 <!-- Add a nice image here at the end of the week, showing off your shiny frontend 📸 -->
 
 <!-- Maybe a table of contents here? 📚 -->
